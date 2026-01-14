@@ -4,15 +4,18 @@ import com.swethaa.issueflow.entity.User;
 import com.swethaa.issueflow.entity.Role;
 import com.swethaa.issueflow.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 @Service
 public class UserService {    // Sign Up
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    private UserService(UserRepository userRepository){
+    private UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User register(String name, String email, String password){
@@ -26,7 +29,7 @@ public class UserService {    // Sign Up
         User user = new User();
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(password); //Plain for now , BCrypt comes in Phase 2
+        user.setPassword(passwordEncoder.encode(password)); //Plain for now , BCrypt comes in Phase 2
         user.setRole(Role.USER);
 
         return userRepository.save(user);
@@ -40,8 +43,8 @@ public class UserService {    // Sign Up
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
         //Plain password check
-        if(!user.getPassword().equals(password)){
-            throw new IllegalArgumentException("Invalid email or passowrd");
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            throw new IllegalArgumentException("Invalid email or password");
         }
         return user;
     }
