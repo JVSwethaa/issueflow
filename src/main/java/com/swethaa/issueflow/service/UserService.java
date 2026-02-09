@@ -4,6 +4,7 @@ import com.swethaa.issueflow.entity.User;
 import com.swethaa.issueflow.entity.Role;
 import com.swethaa.issueflow.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;

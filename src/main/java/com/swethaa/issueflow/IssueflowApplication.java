@@ -9,5 +9,4 @@ public class IssueflowApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(IssueflowApplication.class, args);
 	}
-
 }

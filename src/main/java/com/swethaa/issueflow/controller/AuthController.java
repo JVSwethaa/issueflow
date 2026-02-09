@@ -25,6 +25,8 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
+
+
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegisterRequest request){
         User created = userService.register(request.getName(), request.getEmail(), request.getPassword());
