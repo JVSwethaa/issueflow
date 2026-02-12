@@ -12,6 +12,13 @@ import java.util.List;
 import com.swethaa.issueflow.dto.IssueUpdateRequest;
 import com.swethaa.issueflow.entity.IssueStatus;
 
+import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
+import com.swethaa.issueflow.entity.Priority;
+
 @Service
 public class IssueService {
     private final IssueRepository issueRepository;
@@ -34,8 +41,9 @@ public class IssueService {
         return issueRepository.save(issue);
     }
 
-    public List<Issue> getAllIssues(){
-        List<Issue> issues = issueRepository.findAll();
+    @Transactional(readOnly = true)
+    public Page<Issue> getAllIssues(Pageable pageable){
+        Page<Issue> issues = issueRepository.findAll(pageable);
 
         if(issues.isEmpty()){
             throw new IllegalArgumentException("No issues found");
@@ -43,6 +51,7 @@ public class IssueService {
         return issues;
     }
 
+    @Transactional(readOnly = true)
     public Issue getIssueById(Long id){
         return issueRepository.findById(id).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
     }
@@ -72,9 +81,7 @@ public class IssueService {
 
     public Issue updateStatus(Long id, IssueStatus newStatus){
         Issue issue = issueRepository.findById(id).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
-
         IssueStatus current = issue.getStatus();
-
         boolean valid =
                 (current == IssueStatus.OPEN && newStatus == IssueStatus.IN_PROGRESS) ||
                         (current == IssueStatus.IN_PROGRESS && newStatus == IssueStatus.RESOLVED) ||
@@ -83,10 +90,32 @@ public class IssueService {
         if (!valid) {
             throw new IllegalStateException("Invalid status transition from " + current + " to " + newStatus);
         }
-
         issue.setStatus(newStatus);
-
         return issueRepository.save(issue);
 
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Issue> findIssueByStatus(IssueStatus status, Pageable pageable){
+        Page<Issue> issues = issueRepository.findIssueByStatus(status, pageable);
+
+        if(issues.isEmpty()){
+            throw new IllegalArgumentException("No issues found");
+        }
+        else{
+            return issues;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Issue> findIssueByPriority(Priority priority, Pageable pageable){
+        Page<Issue> issues = issueRepository.findIssueByPriority(priority, pageable);
+
+        if(issues.isEmpty()){
+            throw new IllegalArgumentException("No issues found");
+        }
+        else{
+            return issues;
+        }
     }
 }
