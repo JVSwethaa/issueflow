@@ -34,10 +34,10 @@ public class IssueController {
     }
 
     @PostMapping
-    public ResponseEntity<Issue> createIssue(@RequestBody IssueCreateRequest request, Authentication authentication){
+    public ResponseEntity<IssueResponse> createIssue(@RequestBody IssueCreateRequest request, Authentication authentication){
         System.out.println("AUTH NAME = " + authentication.getName());
         String reporterEmail = authentication.getName();
-        Issue created = issueService.createIssue(request, reporterEmail);
+        IssueResponse created = issueService.createIssue(request, reporterEmail);
         return ResponseEntity.ok(created);
     }
 
@@ -54,27 +54,27 @@ public class IssueController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Issue> updateIssue(@PathVariable Long id, @RequestBody IssueUpdateRequest issueUpdateRequest){
-        Issue updated = issueService.updateIssue(id, issueUpdateRequest);
+    public ResponseEntity<IssueDetailResponse> updateIssue(@PathVariable Long id, @RequestBody IssueUpdateRequest issueUpdateRequest){
+        IssueDetailResponse updated = issueService.updateIssue(id, issueUpdateRequest);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Issue> deleteById(@PathVariable Long id){
+    public ResponseEntity<Void> deleteById(@PathVariable Long id){
        issueService.deleteById(id);
        return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasRole('USER','ADMIN')")
     @PutMapping("/{issueId}/assign/{userId}")
-    public ResponseEntity<Issue> assignIssue(@PathVariable Long issueId, @PathVariable Long userId){
-        Issue updated = issueService.assignIssue(issueId, userId);
+    public ResponseEntity<IssueDetailResponse> assignIssue(@PathVariable Long issueId, @PathVariable Long userId){
+        IssueDetailResponse updated = issueService.assignIssue(issueId, userId);
         return ResponseEntity.ok(updated);
     }
 
     @PutMapping("{id}/status")
-    public ResponseEntity<Issue> updateStatus(@PathVariable Long id, @RequestBody IssueStatusUpdateRequest request){
-        Issue updated = issueService.updateStatus(id, request.getStatus());
+    public ResponseEntity<IssueDetailResponse> updateStatus(@PathVariable Long id, @RequestBody IssueStatusUpdateRequest request){
+        IssueDetailResponse updated = issueService.updateStatus(id, request.getStatus());
         return ResponseEntity.ok(updated);
     }
 

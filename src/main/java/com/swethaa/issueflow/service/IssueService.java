@@ -32,7 +32,7 @@ public class IssueService {
         this.userRepository = userRepository;
     }
 
-    public Issue createIssue(IssueCreateRequest request, String reporterEmail){
+    public IssueResponse createIssue(IssueCreateRequest request, String reporterEmail){
         User reporter = userRepository.findByEmail(reporterEmail).orElseThrow(() -> new IllegalArgumentException("Reporter not found"));
 
         Issue issue = new Issue();
@@ -41,7 +41,17 @@ public class IssueService {
         issue.setPriority(request.getPriority());
         issue.setReporter(reporter);
 
-        return issueRepository.save(issue);
+        Issue saved = issueRepository.save(issue);
+
+        return new IssueResponse(
+                saved.getId(),
+                saved.getTitle(),
+                saved.getStatus(),
+                saved.getPriority(),
+                saved.getCreatedAt(),
+                saved.getReporter().getName(),
+                saved.getAssignee() != null ? saved.getAssignee().getName() : null
+        );
     }
 
     @Transactional(readOnly = true)
@@ -80,7 +90,7 @@ public class IssueService {
         );
     }
 
-    public Issue updateIssue(Long id, IssueUpdateRequest request){
+    public IssueDetailResponse updateIssue(Long id, IssueUpdateRequest request){
         Issue issue = issueRepository.findById(id).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
 
         if(request.getTitle() != null) issue.setTitle(request.getTitle());
@@ -88,7 +98,21 @@ public class IssueService {
         if(request.getPriority() != null) issue.setPriority(request.getPriority());
         if(request.getStatus() != null) issue.setStatus(request.getStatus());
 
-        return issueRepository.save(issue);
+        Issue updated = issueRepository.save(issue);
+
+        return new IssueDetailResponse(
+                updated.getId(),
+                updated.getTitle(),
+                updated.getDescription(),
+                updated.getStatus(),
+                updated.getPriority(),
+                updated.getCreatedAt(),
+                updated.getUpdatedAt(),
+                updated.getReporter().getName(),
+                updated.getReporter().getEmail(),
+                updated.getAssignee() != null ? updated.getAssignee().getName() : null,
+                updated.getAssignee() != null ? updated.getAssignee().getEmail() : null
+        );
     }
 
     public void deleteById(Long id){
@@ -96,14 +120,29 @@ public class IssueService {
         issueRepository.delete(issue);
     }
 
-    public Issue assignIssue(Long issueId, Long userId) {
+    public IssueDetailResponse assignIssue(Long issueId, Long userId) {
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new IllegalArgumentException("Issue Not Found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Illegal Argument Exception"));
         issue.setAssignee(user);
-        return issueRepository.save(issue);
+
+        Issue updated = issueRepository.save(issue);
+
+        return new IssueDetailResponse(
+                updated.getId(),
+                updated.getTitle(),
+                updated.getDescription(),
+                updated.getStatus(),
+                updated.getPriority(),
+                updated.getCreatedAt(),
+                updated.getUpdatedAt(),
+                updated.getReporter().getName(),
+                updated.getReporter().getEmail(),
+                updated.getAssignee() != null ? updated.getAssignee().getName() : null,
+                updated.getAssignee() != null ? updated.getAssignee().getEmail() : null
+        );
     }
 
-    public Issue updateStatus(Long id, IssueStatus newStatus){
+    public IssueDetailResponse updateStatus(Long id, IssueStatus newStatus){
         Issue issue = issueRepository.findById(id).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
         IssueStatus current = issue.getStatus();
         boolean valid =
@@ -115,7 +154,22 @@ public class IssueService {
             throw new IllegalStateException("Invalid status transition from " + current + " to " + newStatus);
         }
         issue.setStatus(newStatus);
-        return issueRepository.save(issue);
+
+        Issue updated = issueRepository.save(issue);
+
+        return new IssueDetailResponse(
+                updated.getId(),
+                updated.getTitle(),
+                updated.getDescription(),
+                updated.getStatus(),
+                updated.getPriority(),
+                updated.getCreatedAt(),
+                updated.getUpdatedAt(),
+                updated.getReporter().getName(),
+                updated.getReporter().getEmail(),
+                updated.getAssignee() != null ? updated.getAssignee().getName() : null,
+                updated.getAssignee() != null ? updated.getAssignee().getEmail() : null
+        );
 
     }
 
