@@ -19,6 +19,9 @@ import org.springframework.data.domain.Page;
 
 import com.swethaa.issueflow.entity.Priority;
 
+import com.swethaa.issueflow.dto.IssueResponse;
+import com.swethaa.issueflow.dto.IssueDetailResponse;
+
 @Service
 public class IssueService {
     private final IssueRepository issueRepository;
@@ -42,18 +45,39 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Issue> getAllIssues(Pageable pageable){
+    public Page<IssueResponse> getAllIssues(Pageable pageable){
         Page<Issue> issues = issueRepository.findAll(pageable);
 
         if(issues.isEmpty()){
             throw new IllegalArgumentException("No issues found");
         }
-        return issues;
+        return issues.map(issue -> new IssueResponse(
+                issue.getId(),
+                issue.getTitle(),
+                issue.getStatus(),
+                issue.getPriority(),
+                issue.getCreatedAt(),
+                issue.getReporter().getName(),
+                issue.getAssignee() != null? issue.getAssignee().getName() : null));
     }
 
     @Transactional(readOnly = true)
-    public Issue getIssueById(Long id){
-        return issueRepository.findById(id).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
+    public IssueDetailResponse getIssueById(Long id){
+        Issue issue = issueRepository.findById(id).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
+
+        return new IssueDetailResponse(
+                issue.getId(),
+                issue.getTitle(),
+                issue.getDescription(),
+                issue.getStatus(),
+                issue.getPriority(),
+                issue.getCreatedAt(),
+                issue.getUpdatedAt(),
+                issue.getReporter().getName(),
+                issue.getReporter().getEmail(),
+                issue.getAssignee() != null? issue.getAssignee().getName() : null,
+                issue.getAssignee() != null? issue.getAssignee().getEmail() : null
+        );
     }
 
     public Issue updateIssue(Long id, IssueUpdateRequest request){
@@ -96,26 +120,39 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Issue> findIssueByStatus(IssueStatus status, Pageable pageable){
+    public Page<IssueResponse> findIssueByStatus(IssueStatus status, Pageable pageable){
         Page<Issue> issues = issueRepository.findIssueByStatus(status, pageable);
 
         if(issues.isEmpty()){
             throw new IllegalArgumentException("No issues found");
         }
-        else{
-            return issues;
-        }
+        return issues.map(issue -> new IssueResponse(
+                issue.getId(),
+                issue.getTitle(),
+                issue.getStatus(),
+                issue.getPriority(),
+                issue.getCreatedAt(),
+                issue.getReporter().getName(),
+                issue.getAssignee() != null? issue.getAssignee().getName() : null
+        ));
     }
 
     @Transactional(readOnly = true)
-    public Page<Issue> findIssueByPriority(Priority priority, Pageable pageable){
+    public Page<IssueResponse> findIssueByPriority(Priority priority, Pageable pageable){
         Page<Issue> issues = issueRepository.findIssueByPriority(priority, pageable);
 
         if(issues.isEmpty()){
             throw new IllegalArgumentException("No issues found");
         }
-        else{
-            return issues;
-        }
+
+        return issues.map(issue -> new IssueResponse(
+                issue.getId(),
+                issue.getTitle(),
+                issue.getStatus(),
+                issue.getPriority(),
+                issue.getCreatedAt(),
+                issue.getReporter().getName(),
+                issue.getAssignee() != null? issue.getAssignee().getName() : null
+        ));
     }
 }
