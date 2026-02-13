@@ -18,6 +18,10 @@ import org.springframework.data.domain.Pageable;
 import com.swethaa.issueflow.entity.IssueStatus;
 import com.swethaa.issueflow.entity.Priority;
 
+import com.swethaa.issueflow.dto.IssueResponse;
+import com.swethaa.issueflow.dto.IssueDetailResponse;
+
+
 
 
 @RestController
@@ -38,14 +42,14 @@ public class IssueController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Issue>> getAllIssues(Pageable pageable){
-        Page<Issue> issues = issueService.getAllIssues(pageable);
+    public ResponseEntity<Page<IssueResponse>> getAllIssues(Pageable pageable){
+        Page<IssueResponse> issues = issueService.getAllIssues(pageable);
         return ResponseEntity.ok(issues);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Issue> getIssueById(@PathVariable Long id){
-        Issue issue = issueService.getIssueById(id);
+    public ResponseEntity<IssueDetailResponse> getIssueById(@PathVariable Long id){
+        IssueDetailResponse issue = issueService.getIssueById(id);
         return ResponseEntity.ok(issue);
     }
 
@@ -75,15 +79,15 @@ public class IssueController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<Page<Issue>> getIssuesByStatus(@PathVariable("status") IssueStatus issueStatus, Pageable pageable){
-        Page<Issue> issues = issueService.findIssueByStatus(issueStatus, pageable);
+    public ResponseEntity<Page<IssueResponse>> getIssuesByStatus(@PathVariable("status") IssueStatus issueStatus, Pageable pageable){
+        Page<IssueResponse> issues = issueService.findIssueByStatus(issueStatus, pageable);
 
         return ResponseEntity.ok(issues);
     }
 
     @GetMapping("/priority/{priority}")
-    public ResponseEntity<Page<Issue>> getIssueByPriority(@PathVariable("priority") Priority priority, Pageable pageable){
-        Page<Issue> issues = issueService.findIssueByPriority(priority, pageable);
+    public ResponseEntity<Page<IssueResponse>> getIssueByPriority(@PathVariable("priority") Priority priority, Pageable pageable){
+        Page<IssueResponse> issues = issueService.findIssueByPriority(priority, pageable);
 
         return ResponseEntity.ok(issues);
     }
