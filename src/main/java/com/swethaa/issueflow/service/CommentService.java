@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.swethaa.issueflow.dto.CommentResponse;
+
+import java.util.stream.Collectors;
+
 @Service
 public class CommentService {
 
@@ -25,7 +29,7 @@ public class CommentService {
         this.userRepository = userRepository;
     }
 
-    public Comment addComment(Long issueId, CommentRequest request, String authorEmail){
+    public CommentResponse addComment(Long issueId, CommentRequest request, String authorEmail){
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
         User author = userRepository.findByEmail(authorEmail).orElseThrow(() -> new IllegalArgumentException ("User not found"));
 
@@ -34,15 +38,32 @@ public class CommentService {
         comment.setIssue(issue);
         comment.setAuthor(author);
 
-        return commentRepository.save(comment);
+        Comment saved = commentRepository.save(comment);
+
+        return new CommentResponse(
+                saved.getId(),
+                saved.getContent(),
+                saved.getCreatedAt(),
+                saved.getAuthor().getName(),
+                saved.getAuthor().getEmail()
+        );
     }
 
     @Transactional(readOnly = true)
-    public List<Comment> getComments(Long issueId){
+    public List<CommentResponse> getComments(Long issueId){
         System.out.println("SERVICE looking for issueId = " + issueId);
         Issue issue = issueRepository.findById(issueId).orElseThrow(() -> new IllegalArgumentException ("Issue not found"));
 
-        return commentRepository.findByIssue_Id(issueId);
+        return commentRepository.findByIssueId(issueId)
+                .stream()
+                .map(comment -> new CommentResponse(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getCreatedAt(),
+                        comment.getAuthor().getName(),
+                        comment.getAuthor().getEmail()
+                ))
+                .collect(Collectors.toList());
     }
 
 }

@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import java.util.List;
 
+import com.swethaa.issueflow.dto.CommentResponse;
+
 @RestController
 @RequestMapping("/issues/{issueId}/comments")
 public class CommentController {
@@ -20,16 +22,18 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<Comment> addComment(@PathVariable("issueId") Long issueId, @RequestBody CommentRequest commentRequest, Authentication authentication){
+    public ResponseEntity<CommentResponse> addComment(@PathVariable("issueId") Long issueId, @RequestBody CommentRequest commentRequest, Authentication authentication){
         String authorEmail = authentication.getName();
-        Comment created = commentService.addComment(issueId, commentRequest, authorEmail);
+        CommentResponse created = commentService.addComment(issueId, commentRequest, authorEmail);
 
 
         return ResponseEntity.ok(created);
     }
 
     @GetMapping
-    public ResponseEntity<List<Comment>> getComments(@PathVariable("issueId") Long issueId){
-        return ResponseEntity.ok(commentService.getComments(issueId));
+    public ResponseEntity<List<CommentResponse>> getComments(@PathVariable("issueId") Long issueId){
+        List<CommentResponse> comments = commentService.getComments(issueId);
+
+        return ResponseEntity.ok(comments);
     }
 }
