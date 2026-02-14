@@ -9,17 +9,24 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import com.swethaa.issueflow.dto.RegisterResponse;
+import com.swethaa.issueflow.dto.LoginResponse;
+
+import com.swethaa.issueflow.security.JwtService;
+
 @Service
 public class UserService {    // Sign Up
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    private UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    private UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
-    public User register(String name, String email, String password){
+    public RegisterResponse register(String name, String email, String password){
 
         // Check duplicate email
         if(userRepository.existsByEmail(email)){
@@ -33,20 +40,30 @@ public class UserService {    // Sign Up
         user.setPassword(passwordEncoder.encode(password)); //Plain for now , BCrypt comes in Phase 2
         user.setRole(Role.USER);
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+
+        return new RegisterResponse(
+                saved.getId(),
+                saved.getName(),
+                saved.getEmail(),
+                saved.getRole()
+        );
     }
 
     public Optional<User> findByEmail(String email){
         return userRepository.findByEmail(email);
     }
 
-    public User login(String email, String password){
+    public LoginResponse login(String email, String password){
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
         //Plain password check
         if(!passwordEncoder.matches(password, user.getPassword())){
             throw new IllegalArgumentException("Invalid email or password");
         }
-        return user;
+
+        String token = jwtService.generateToken(user);
+
+        return new LoginResponse(token);
     }
 }
