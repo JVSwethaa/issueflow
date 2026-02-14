@@ -16,6 +16,8 @@ import com.swethaa.issueflow.dto.LoginResponse;
 
 import com.swethaa.issueflow.dto.RegisterResponse;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -30,13 +32,13 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request){
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request){
         RegisterResponse created = userService.register(request.getName(), request.getEmail(), request.getPassword());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
         /*User user = userService.login(request.getEmail(), request.getPassword());
         String token = jwtService.generateToken(user);*/
 

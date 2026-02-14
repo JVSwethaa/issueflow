@@ -21,6 +21,8 @@ import com.swethaa.issueflow.entity.Priority;
 import com.swethaa.issueflow.dto.IssueResponse;
 import com.swethaa.issueflow.dto.IssueDetailResponse;
 
+import jakarta.validation.Valid;
+
 
 
 
@@ -34,7 +36,7 @@ public class IssueController {
     }
 
     @PostMapping
-    public ResponseEntity<IssueResponse> createIssue(@RequestBody IssueCreateRequest request, Authentication authentication){
+    public ResponseEntity<IssueResponse> createIssue(@Valid @RequestBody IssueCreateRequest request, Authentication authentication){
         System.out.println("AUTH NAME = " + authentication.getName());
         String reporterEmail = authentication.getName();
         IssueResponse created = issueService.createIssue(request, reporterEmail);
@@ -54,7 +56,7 @@ public class IssueController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<IssueDetailResponse> updateIssue(@PathVariable Long id, @RequestBody IssueUpdateRequest issueUpdateRequest){
+    public ResponseEntity<IssueDetailResponse> updateIssue(@PathVariable Long id, @Valid @RequestBody IssueUpdateRequest issueUpdateRequest){
         IssueDetailResponse updated = issueService.updateIssue(id, issueUpdateRequest);
         return ResponseEntity.ok(updated);
     }

@@ -3,7 +3,9 @@ package com.swethaa.issueflow.dto;
 import com.swethaa.issueflow.entity.IssueStatus;
 import com.swethaa.issueflow.entity.Priority;
 
+
 public class IssueUpdateRequest {
+
     private String title;
     private String description;
     private IssueStatus status;

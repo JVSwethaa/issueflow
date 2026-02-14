@@ -1,8 +1,18 @@
 package com.swethaa.issueflow.dto;
 
+import jakarta.validation.constraints.*;
+
 public class RegisterRequest {
+
+    @NotBlank (message = "name is required")
     private String name;
+
+    @NotBlank (message = "Email is required")
+    @Email (message = "Email format is invalid")
     private String email;
+
+    @NotBlank (message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
     public String getName() {

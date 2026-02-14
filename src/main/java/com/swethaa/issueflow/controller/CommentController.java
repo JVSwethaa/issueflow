@@ -11,6 +11,8 @@ import java.util.List;
 
 import com.swethaa.issueflow.dto.CommentResponse;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/issues/{issueId}/comments")
 public class CommentController {
@@ -22,7 +24,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentResponse> addComment(@PathVariable("issueId") Long issueId, @RequestBody CommentRequest commentRequest, Authentication authentication){
+    public ResponseEntity<CommentResponse> addComment(@PathVariable("issueId") Long issueId, @Valid @RequestBody CommentRequest commentRequest, Authentication authentication){
         String authorEmail = authentication.getName();
         CommentResponse created = commentService.addComment(issueId, commentRequest, authorEmail);
 
